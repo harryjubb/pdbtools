@@ -94,7 +94,7 @@ for residue in heteroresidues:
                     continue
                 
                 sum_cov_radii = atom.covrad + nearby_atom.covrad
-                distance = np.linalg.norm(atom.coord - nearby_atom.coord)
+                distance = norm(atom.coord - nearby_atom.coord)
                 
                 if distance <= sum_cov_radii:
                     
