@@ -33,7 +33,7 @@ MAX_COV_BOND = MAX_COV_RADIUS * 2
 PDB_LINE_TEMPLATE = '{record: <6}{serial: >5}{atom_name: ^5}{altloc: ^1}{resname: ^3} {chain_id: ^1}{resnum: >4}{icode: ^1}   {x: >8.3f}{y: >8.3f}{z: >8.3f}{occ: >6.2f}{tfac: >6.2f}          {element: >2}{charge: >2}'
 
 # FILENAME MUNGING
-pdb_path = '/data2/fragment_analysis/pdb_clean/xk/1xkk/1xkk-1.pdb' # sys.argv[1]
+pdb_path = sys.argv[1]
 pdb_noext, pdb_ext = os.path.splitext(pdb_path)
 pdb_ext = pdb_ext.replace('.', '')
 
