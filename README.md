@@ -1,3 +1,3 @@
 # PDBTools #
 
-Tool(s) for cleaning PDB files for structural bioinformatics analysis.
+Tool(s) for cleaning, munging and analysing PDB files for structural bioinformatics analysis.
