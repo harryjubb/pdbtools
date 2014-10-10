@@ -96,8 +96,9 @@ if __name__ == '__main__':
     for chain_id in chain_polypeptides:
     
         pp_seqs = [str(x.get_sequence()) for x in chain_polypeptides[chain_id]]
-    
-        chain_sequences[chain_id] = reduce(operator.add, pp_seqs)
+        
+        if pp_seqs:
+            chain_sequences[chain_id] = reduce(operator.add, pp_seqs)
     
     # WRITE OUT CLEANED PDB
     # MANY OF THE ISSUES ARE SOLVED DURING THE WRITING OUT
