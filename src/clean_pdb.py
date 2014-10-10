@@ -15,6 +15,16 @@
 # - Selenomets to Mets ** DONE **
 # - Nonstandard res to ATOM records ** DONE **
 
+#
+# LIST FROM DOUGLAS
+# -Remove waters - DONE
+# -Remove multiple occupancies - DONE
+# -Select first model - DONE
+# -Check for chain breaks - DONE
+# -Check for missing backbone atoms - DONE
+# -Remove hydrogen atoms - DONE
+#
+
 # IMPORTS
 import logging
 import operator
@@ -102,6 +112,8 @@ if __name__ == '__main__':
     
     # WRITE OUT CLEANED PDB
     # MANY OF THE ISSUES ARE SOLVED DURING THE WRITING OUT
+    missing_mainchain_atoms = []
+    
     with open('.'.join((pdb_noext, 'clean', pdb_ext)), 'wb') as fo:
         
         atom_serial = 1
@@ -113,10 +125,20 @@ if __name__ == '__main__':
             # SET HETATM RECORD IF IT WAS ORIGINALLY A HETATM OR WATER
             if residue.get_full_id()[3][0] == 'W' or residue.get_full_id()[3][0].startswith('H_'):
                 record = 'HETATM'
+                
+            # REMOVE WATERS
+            if residue.get_full_id()[3][0] == 'W':
+                continue
             
             # SET ATOM RECORD IF THE RESIDUE IS IN A POLYPEPETIDE
             if residue in polypeptide_residues:
                 record = 'ATOM'
+                
+                # CHECK FOR MISSING BACKBONE ATOMS
+                atom_names = [atom.name.strip() for atom in residue.child_list]
+                
+                if 'N' not in atom_names or 'C' not in atom_names or 'CA' not in atom_names or 'O' not in atom_names:
+                    missing_mainchain_atoms.append('\t'.join([str(x) for x in [residue.get_parent().id, residue.get_id()[1], residue.get_id()[2], atom_names]]))
             
             # LOOP THROUGH ATOMS TO OUTPUT
             for atom in residue.child_list:
@@ -124,6 +146,10 @@ if __name__ == '__main__':
                 # DEAL WITH DISORDERED ATOMS
                 if atom.is_disordered():
                     atom = atom.disordered_get()
+                
+                # REMOVE HYDROGENS
+                if atom.element.strip() == 'H':
+                    continue
                 
                 # CONVERT SELENOMETHIONINES TO METHIONINES
                 if residue in polypeptide_residues and (residue.resname == 'MSE' or residue.resname == 'MET'):
@@ -160,21 +186,21 @@ if __name__ == '__main__':
                 
                 atom_serial += 1
     
+    # WRITE OUT RESIDUES WITH MISSING MAINCHAIN ATOMS
+    with open('.'.join((pdb_noext, pdb_ext, 'missing_mainchain')), 'wb') as fo:
+        
+        for output in missing_mainchain_atoms:
+            
+            fo.write('{}\n'.format(output))
+    
     # WRITE OUT COORDINATES FOR CHAIN BREAKS FOUND WITH THE PDB FILE
     with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'wb') as fo:
         
         for chain_break_residue in all_chain_break_residues:
             
-            if 'CA' in chain_break_residue.child_dict:
-                break_coord = list(chain_break_residue.child_dict['CA'].coord)
-                
-            elif 'N' in chain_break_residue.child_dict:
-                break_coord = list(chain_break_residue.child_dict['N'].coord)
-                
-            elif 'C' in chain_break_residue.child_dict:
-                break_coord = list(chain_break_residue.child_dict['C'].coord)
-                
-            else:
-                raise ValueError('Chain break residue {} had no mainchain atom to extract coordinates from.'.format(chain_break_residue))
+            output = '\t'.join([str(x) for x in [chain_break_residue.get_parent().id, chain_break_residue.get_id()[1], chain_break_residue.get_id()[2]]])
             
-            fo.write('{}\n'.format(str(break_coord)))
+            fo.write('{}\n'.format(output))
+            
+            
+            
