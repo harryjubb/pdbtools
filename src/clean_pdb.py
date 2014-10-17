@@ -125,6 +125,10 @@ if __name__ == '__main__':
                 if atom.is_disordered():
                     atom = atom.disordered_get()
                 
+                # REMOVE HYDROGENS
+                if atom.element.strip() == 'H':
+                    continue
+                
                 # CONVERT SELENOMETHIONINES TO METHIONINES
                 if residue in polypeptide_residues and (residue.resname == 'MSE' or residue.resname == 'MET'):
                     
@@ -133,7 +137,6 @@ if __name__ == '__main__':
                     if atom.name == 'SE' and atom.element == 'SE':
                         atom.name = 'SD'
                         atom.element = 'S'
-                    
                 
                 # PDB OUTPUT
                 # ATOM SERIALS ARE RENUMBERED FROM 1
