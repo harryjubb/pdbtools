@@ -16,10 +16,10 @@
 # - Nonstandard res to ATOM records ** DONE **
 
 # IMPORTS
+import argparse
 import logging
 import operator
 import os
-import sys
 
 from collections import OrderedDict
 
@@ -27,14 +27,33 @@ from Bio.PDB import PDBParser
 from Bio.PDB import Select
 from Bio.PDB.Polypeptide import PPBuilder
 
-
 # CONSTANTS
 PDB_LINE_TEMPLATE = '{record: <6}{serial: >5}{atom_name: ^5}{altloc: ^1}{resname: ^3} {chain_id: ^1}{resnum: >4}{icode: ^1}   {x: >8.3f}{y: >8.3f}{z: >8.3f}{occ: >6.2f}{tfac: >6.2f}          {element: >2}{charge: >2}'
 
 # MAIN
 if __name__ == '__main__':
     
-    pdb_path = sys.argv[1]
+    # ARGUMENT PARSING
+    parser = argparse.ArgumentParser(description='''
+
+#############
+# CLEAN PDB #
+#############
+
+A program for cleaning PDB files.
+
+Dependencies:
+- Python (v2.7)
+- BioPython (>= v1.60)
+
+''', formatter_class=argparse.RawTextHelpFormatter)
+    
+    parser.add_argument('pdb', type=str, help='Path to the PDB file to be cleaned.')
+    parser.add_argument('-rmw', '--remove-waters', action='store_true', help='Remove waters.')
+    
+    args = parser.parse_args()
+    
+    pdb_path = args.pdb
     pdb_noext, pdb_ext = os.path.splitext(pdb_path)
     pdb_ext = pdb_ext.replace('.', '')
     
@@ -108,6 +127,11 @@ if __name__ == '__main__':
         
         for residue in model.get_residues():
         
+            # REMOVE WATERS IF FLAG SET
+            if args.remove_waters:
+                if residue.get_full_id()[3][0] == 'W':
+                    continue
+            
             record = 'ATOM'
             
             # SET HETATM RECORD IF IT WAS ORIGINALLY A HETATM OR WATER
