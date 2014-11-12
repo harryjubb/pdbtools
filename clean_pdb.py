@@ -50,6 +50,7 @@ Dependencies:
     
     parser.add_argument('pdb', type=str, help='Path to the PDB file to be cleaned.')
     parser.add_argument('-rmw', '--remove-waters', action='store_true', help='Remove waters.')
+    parser.add_argument('-kh', '--keep-hydrogens', action='store_true', help='Keep hydrogens.')
     
     args = parser.parse_args()
     
@@ -150,8 +151,9 @@ Dependencies:
                     atom = atom.disordered_get()
                 
                 # REMOVE HYDROGENS
-                if atom.element.strip() == 'H':
-                    continue
+                if not args.keep_hydrogens:
+                    if atom.element.strip() == 'H':
+                        continue
                 
                 # CONVERT SELENOMETHIONINES TO METHIONINES
                 if residue in polypeptide_residues and (residue.resname == 'MSE' or residue.resname == 'MET'):
