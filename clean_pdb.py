@@ -51,6 +51,7 @@ Dependencies:
     parser.add_argument('pdb', type=str, help='Path to the PDB file to be cleaned.')
     parser.add_argument('-rmw', '--remove-waters', action='store_true', help='Remove waters.')
     parser.add_argument('-kh', '--keep-hydrogens', action='store_true', help='Keep hydrogens.')
+    parser.add_argument('-if', '--informative_filenames', action='store_true', help='Keep a record of the flags used for cleaning the output filename.')
     
     args = parser.parse_args()
     
@@ -64,11 +65,12 @@ Dependencies:
     # OUTPUT LABEL
     output_label = 'clean'
     
-    if args.remove_waters:
-        output_label = output_label + '_rmw'
-    
-    if args.keep_hydrogens:
-        output_label = output_label + '_kh'
+    if args.informative_filenames:
+        if args.remove_waters:
+            output_label = output_label + '_rmw'
+        
+        if args.keep_hydrogens:
+            output_label = output_label + '_kh'
     
     # REMOVE MULTIPLE MODELS
     # BY TAKING THE FIRST MODEL
