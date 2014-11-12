@@ -61,6 +61,15 @@ Dependencies:
     pdb_parser = PDBParser()
     structure = pdb_parser.get_structure(os.path.split(os.path.splitext(pdb_path)[0])[1], pdb_path)
     
+    # OUTPUT LABEL
+    output_label = 'clean'
+    
+    if args.remove_waters:
+        output_label = output_label + '_rmw'
+    
+    if args.keep_hydrogens:
+        output_label = output_label + '_kh'
+    
     # REMOVE MULTIPLE MODELS
     # BY TAKING THE FIRST MODEL
     model = structure[0]
@@ -122,7 +131,7 @@ Dependencies:
     
     # WRITE OUT CLEANED PDB
     # MANY OF THE ISSUES ARE SOLVED DURING THE WRITING OUT
-    with open('.'.join((pdb_noext, 'clean', pdb_ext)), 'wb') as fo:
+    with open('.'.join((pdb_noext, output_label, pdb_ext)), 'wb') as fo:
         
         atom_serial = 1
         
