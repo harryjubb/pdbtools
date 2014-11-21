@@ -67,7 +67,7 @@ Dependencies:
     
     if args.informative_filenames:
         if args.remove_waters:
-            output_label = output_label + '_rmw'
+            output_label = output_label + '_dry'
         
         if args.keep_hydrogens:
             output_label = output_label + '_kh'
