@@ -201,9 +201,15 @@ Dependencies:
                 atom_serial += 1
     
     # WRITE OUT COORDINATES FOR CHAIN BREAKS FOUND WITH THE PDB FILE
-    with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'wb') as fo:
+    with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'wb') as fo, \
+         open('.'.join((pdb_noext, pdb_ext, 'break_residues')), 'wb') as fo2:
         
         for chain_break_residue in all_chain_break_residues:
+            
+            fo2.write('{},{}{}`{}\n'.format(chain_break_residue.get_parent().id,
+                                             chain_break_residue.get_id()[1], # RESIDUE NUMBER
+                                             chain_break_residue.get_id()[2].strip(), # INSERTION CODE
+                                             chain_break_residue.resname.strip()))
             
             if 'CA' in chain_break_residue.child_dict:
                 break_coord = list(chain_break_residue.child_dict['CA'].coord)
