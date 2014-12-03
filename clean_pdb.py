@@ -199,6 +199,10 @@ Dependencies:
                 fo.write('{}\n'.format(output_line))
                 
                 atom_serial += 1
+                
+                # RAISE AN ERROR IF WE'VE NOW GOT TOO MANY ATOMS
+                if (atom_serial - 1) > 99999:
+                    raise ValueError('More than 99999 atoms in the PDB when renumbered!')
     
     # WRITE OUT COORDINATES FOR CHAIN BREAKS FOUND WITH THE PDB FILE
     with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'wb') as fo, \
