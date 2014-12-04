@@ -20,6 +20,8 @@ import argparse
 import logging
 import operator
 import os
+import sys
+import traceback
 
 from collections import OrderedDict
 
@@ -75,6 +77,14 @@ Dependencies:
     # REMOVE MULTIPLE MODELS
     # BY TAKING THE FIRST MODEL
     model = structure[0]
+    
+    # RAISE AN ERROR FOR TOO MANY ATOMS
+    if len(list(model.get_atoms())) > 99999:
+        try:
+            raise ValueError('More than 99999 atoms in the PDB model!')
+        except:
+            traceback.print_exc(file=sys.stdout)
+            exit(9)
     
     # DETERMINE POLYPEPTIDES AND CHAIN BREAKS
     ppb = PPBuilder()
@@ -202,7 +212,12 @@ Dependencies:
                 
                 # RAISE AN ERROR IF WE'VE NOW GOT TOO MANY ATOMS
                 if (atom_serial - 1) > 99999:
-                    raise ValueError('More than 99999 atoms in the PDB when renumbered!')
+                    
+                    try:
+                        raise ValueError('More than 99999 atoms in the PDB when renumbered!')
+                    except:
+                        traceback.print_exc(file=sys.stdout)
+                        exit(9)
     
     # WRITE OUT COORDINATES FOR CHAIN BREAKS FOUND WITH THE PDB FILE
     with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'wb') as fo, \
