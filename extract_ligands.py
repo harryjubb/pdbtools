@@ -117,95 +117,97 @@ for residue in non_cov_heteroresidues:
         filtered_heteroresidues.append(residue)
 
 # WRITE OUT THE LIGANDS AS PDB FILES
-for residue in filtered_heteroresidues:
-    
-    chain_id = residue.get_parent().id
-    resname = residue.resname
-    resnum = residue.get_full_id()[3][1]
-    inscode = residue.get_full_id()[3][2]
-    
-    if inscode == ' ':
-        inscode = 'i'
-    
-    ligand_filename = '{}_{}_{}_{}_{}.{}'.format(pdb_noext,
-                                                 chain_id,
-                                                 resname,
-                                                 resnum,
-                                                 inscode,
-                                                 pdb_ext)
-    
-    # WRITE OUT THE EXTRACTED LIGAND
-    with open(ligand_filename, 'wb') as fo:
-        
-        for atom in residue.child_list:
-        
-            output_line = PDB_LINE_TEMPLATE.format(record='HETATM',
-                                                   serial=atom.serial_number,
-                                                   atom_name=atom.name,
-                                                   altloc=' ',
-                                                   resname=residue.resname,
-                                                   chain_id=residue.get_parent().id,
-                                                   resnum=residue.get_id()[1],
-                                                   icode=residue.get_id()[2],
-                                                   x=atom.coord[0],
-                                                   y=atom.coord[1],
-                                                   z=atom.coord[2],
-                                                   occ=1.00,
-                                                   tfac=atom.bfactor,
-                                                   element=atom.element,
-                                                   charge='')
-
-            fo.write('{}\n'.format(output_line))
+with open(pdb_noext + '.liglist', 'wb') as llfo:
+	for residue in filtered_heteroresidues:
+	    
+	    chain_id = residue.get_parent().id
+	    resname = residue.resname
+	    resnum = residue.get_full_id()[3][1]
+	    inscode = residue.get_full_id()[3][2]
+	    
+	    if inscode == ' ':
+		inscode = 'i'
+	    
+	    ligand_filename = '{}_{}_{}_{}_{}.{}'.format(pdb_noext,
+							 chain_id,
+							 resname,
+							 resnum,
+							 inscode,
+							 pdb_ext)
+	    
+	    # WRITE OUT THE EXTRACTED LIGAND
+	    llfo.write(ligand_filename + '\n')
+	    with open(ligand_filename, 'wb') as fo:
+		
+		for atom in residue.child_list:
+		
+		    output_line = PDB_LINE_TEMPLATE.format(record='HETATM',
+							   serial=atom.serial_number,
+							   atom_name=atom.name,
+							   altloc=' ',
+							   resname=residue.resname,
+							   chain_id=residue.get_parent().id,
+							   resnum=residue.get_id()[1],
+							   icode=residue.get_id()[2],
+							   x=atom.coord[0],
+							   y=atom.coord[1],
+							   z=atom.coord[2],
+							   occ=1.00,
+							   tfac=atom.bfactor,
+							   element=atom.element,
+							   charge='')
 	
-	# WRITE OUT THE PDB WITHOUT THE EXTRACTED LIGAND (AKA THE RECEPTOR)
-	receptor_filename = '{}_{}_{}_{}_{}_receptor.{}'.format(pdb_noext,
-															chain_id,
-															resname,
-															resnum,
-															inscode,
-															pdb_ext)
-	
-	# RECEPTOR WITH NO WATERS
-	receptor_filename_dry = receptor_filename.replace('_receptor', '_receptor_dry')
-	
-	# WHOLE COMPLEX WITH NO WATERS
-	complex_filename_dry = receptor_filename.replace('_receptor', '_all_dry')
-	
-	with open(receptor_filename, 'wb') as fo, open(receptor_filename_dry, 'wb') as dfo, open(complex_filename_dry, 'wb') as cdfo:
-	
-		for receptor_residue in model.get_residues():
-			
-			for atom in receptor_residue.child_list:
-			
-				# PDB OUTPUT
-				# ATOM SERIALS ARE RENUMBERED FROM 1
-				# ALTLOCS ARE ALWAYS BLANK
-				# CHARGES ARE ALWAYS BLANK(?)
-				# OCCUPANCIES ARE ALWAYS 1.00
-				output_line = PDB_LINE_TEMPLATE.format(record='ATOM',
-													   serial=atom.serial_number,
-													   atom_name=atom.name,
-													   altloc=' ',
-													   resname=receptor_residue.resname,
-													   chain_id=receptor_residue.get_parent().id,
-													   resnum=receptor_residue.get_id()[1],
-													   icode=receptor_residue.get_id()[2],
-													   x=atom.coord[0],
-													   y=atom.coord[1],
-													   z=atom.coord[2],
-													   occ=1.00,
-													   tfac=atom.bfactor,
-													   element=atom.element,
-													   charge='')
+		    fo.write('{}\n'.format(output_line))
+		
+		# WRITE OUT THE PDB WITHOUT THE EXTRACTED LIGAND (AKA THE RECEPTOR)
+		receptor_filename = '{}_{}_{}_{}_{}_receptor.{}'.format(pdb_noext,
+																chain_id,
+																resname,
+																resnum,
+																inscode,
+																pdb_ext)
+		
+		# RECEPTOR WITH NO WATERS
+		receptor_filename_dry = receptor_filename.replace('_receptor', '_receptor_dry')
+		
+		# WHOLE COMPLEX WITH NO WATERS
+		complex_filename_dry = receptor_filename.replace('_receptor', '_all_dry')
+		
+		with open(receptor_filename, 'wb') as fo, open(receptor_filename_dry, 'wb') as dfo, open(complex_filename_dry, 'wb') as cdfo:
+		
+			for receptor_residue in model.get_residues():
 				
-				# RECEPTOR WITHOUT LIGAND BUT WITH WATERS
-				if receptor_residue != residue:
-					fo.write('{}\n'.format(output_line))
+				for atom in receptor_residue.child_list:
+				
+					# PDB OUTPUT
+					# ATOM SERIALS ARE RENUMBERED FROM 1
+					# ALTLOCS ARE ALWAYS BLANK
+					# CHARGES ARE ALWAYS BLANK(?)
+					# OCCUPANCIES ARE ALWAYS 1.00
+					output_line = PDB_LINE_TEMPLATE.format(record='ATOM',
+														   serial=atom.serial_number,
+														   atom_name=atom.name,
+														   altloc=' ',
+														   resname=receptor_residue.resname,
+														   chain_id=receptor_residue.get_parent().id,
+														   resnum=receptor_residue.get_id()[1],
+														   icode=receptor_residue.get_id()[2],
+														   x=atom.coord[0],
+														   y=atom.coord[1],
+														   z=atom.coord[2],
+														   occ=1.00,
+														   tfac=atom.bfactor,
+														   element=atom.element,
+														   charge='')
 					
-					# RECEPTOR WITHOUT LIGAND OR WATERS
+					# RECEPTOR WITHOUT LIGAND BUT WITH WATERS
+					if receptor_residue != residue:
+						fo.write('{}\n'.format(output_line))
+						
+						# RECEPTOR WITHOUT LIGAND OR WATERS
+						if receptor_residue.resname != 'HOH':
+							dfo.write('{}\n'.format(output_line))
+					
+					# WHOLE COMPLEX WITHOUT WATERS
 					if receptor_residue.resname != 'HOH':
-						dfo.write('{}\n'.format(output_line))
-				
-				# WHOLE COMPLEX WITHOUT WATERS
-				if receptor_residue.resname != 'HOH':
-					cdfo.write('{}\n'.format(output_line))
+						cdfo.write('{}\n'.format(output_line))
