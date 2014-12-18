@@ -30,7 +30,7 @@ from Bio.PDB import Select
 from Bio.PDB.Polypeptide import PPBuilder
 
 # CONSTANTS
-PDB_LINE_TEMPLATE = '{record: <6}{serial: >5}{atom_name: ^5}{altloc: ^1}{resname: ^3} {chain_id: ^1}{resnum: >4}{icode: ^1}   {x: >8.3f}{y: >8.3f}{z: >8.3f}{occ: >6.2f}{tfac: >6.2f}          {element: >2}{charge: >2}'
+PDB_LINE_TEMPLATE = '{record: <6}{serial: >5} {atom_name: ^4}{altloc: ^1}{resname: ^3} {chain_id: ^1}{resnum: >4}{icode: ^1}   {x: >8.3f}{y: >8.3f}{z: >8.3f}{occ: >6.2f}{tfac: >6.2f}          {element: >2}{charge: >2}'
 
 # MAIN
 if __name__ == '__main__':
@@ -184,6 +184,10 @@ Dependencies:
                     if atom.name == 'SE' and atom.element == 'SE':
                         atom.name = 'SD'
                         atom.element = 'S'
+                
+                # FIX ATOM NAME BUG
+                if len(atom.name) == 3:
+                    atom.name = ' ' + atom.name
                 
                 # PDB OUTPUT
                 # ATOM SERIALS ARE RENUMBERED FROM 1
