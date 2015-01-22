@@ -30,7 +30,7 @@ COVALENT_RADII = {
 MAX_COV_RADIUS = max(COVALENT_RADII.values())
 MAX_COV_BOND = MAX_COV_RADIUS * 2
 
-PDB_LINE_TEMPLATE = '{record: <6}{serial: >5}{atom_name: ^5}{altloc: ^1}{resname: ^3} {chain_id: ^1}{resnum: >4}{icode: ^1}   {x: >8.3f}{y: >8.3f}{z: >8.3f}{occ: >6.2f}{tfac: >6.2f}          {element: >2}{charge: >2}'
+PDB_LINE_TEMPLATE = '{record: <6}{serial: >5} {atom_name: ^4}{altloc: ^1}{resname: ^3} {chain_id: ^1}{resnum: >4}{icode: ^1}   {x: >8.3f}{y: >8.3f}{z: >8.3f}{occ: >6.2f}{tfac: >6.2f}          {element: >2}{charge: >2}'
 
 # FILENAME MUNGING
 pdb_path = sys.argv[1]
@@ -140,7 +140,11 @@ with open(pdb_noext + '.liglist', 'wb') as llfo:
 	    with open(ligand_filename, 'wb') as fo:
 		
 		for atom in residue.child_list:
-		
+
+                    # FIX ATOM NAME BUG
+                    if len(atom.name) == 3:
+                        atom.name = ' ' + atom.name
+				
 		    output_line = PDB_LINE_TEMPLATE.format(record='HETATM',
 							   serial=atom.serial_number,
 							   atom_name=atom.name,
