@@ -22,6 +22,7 @@ import operator
 import os
 import sys
 import traceback
+from functools import reduce
 
 from collections import OrderedDict
 
@@ -143,7 +144,7 @@ Dependencies:
     
     # WRITE OUT CLEANED PDB
     # MANY OF THE ISSUES ARE SOLVED DURING THE WRITING OUT
-    with open('.'.join((pdb_noext, output_label, pdb_ext)), 'wb') as fo:
+    with open('.'.join((pdb_noext, output_label, pdb_ext)), 'w') as fo:
         
         atom_serial = 1
         
@@ -224,8 +225,8 @@ Dependencies:
                         exit(9)
     
     # WRITE OUT COORDINATES FOR CHAIN BREAKS FOUND WITH THE PDB FILE
-    with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'wb') as fo, \
-         open('.'.join((pdb_noext, pdb_ext, 'break_residues')), 'wb') as fo2:
+    with open('.'.join((pdb_noext, pdb_ext, 'breaks')), 'w') as fo, \
+         open('.'.join((pdb_noext, pdb_ext, 'break_residues')), 'w') as fo2:
         
         for chain_break_residue in all_chain_break_residues:
             
